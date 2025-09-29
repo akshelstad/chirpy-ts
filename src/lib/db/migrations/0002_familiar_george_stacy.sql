@@ -1,0 +1,1 @@
+ALTER TABLE "chirps" ALTER COLUMN "body" SET DATA TYPE varchar(256);
