@@ -48,9 +48,32 @@ export async function handlerAddChirp(req: Request, res: Response) {
   respondWithJSON(res, 201, chirp);
 }
 
-export async function handlerGetChirps(_: Request, res: Response) {
+export async function handlerGetChirps(req: Request, res: Response) {
   const chirps = await getChirps();
-  respondWithJSON(res, 200, chirps);
+
+  let authorId = "";
+  let authorIdQuery = req.query.authorId;
+  if (typeof authorIdQuery === "string") {
+    authorId = authorIdQuery;
+  }
+
+  let sort = "asc";
+  let sortQuery = req.query.sort;
+  if (typeof sortQuery === "string") {
+    sort = sortQuery;
+  }
+
+  if (sort === "desc") {
+    chirps.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  } else {
+    chirps.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }
+
+  const filteredChirps = chirps.filter(
+    (chirp) => chirp.userId === authorId || authorId === ""
+  );
+
+  respondWithJSON(res, 200, filteredChirps);
 }
 
 export async function handlerGetChirp(req: Request, res: Response) {
