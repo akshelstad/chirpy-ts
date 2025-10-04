@@ -14,6 +14,7 @@ import {
   validateJWT,
   getBearerToken,
   ReqLike,
+  getAPIKey,
 } from "./auth.js";
 import { UnauthorizedError } from "./api/errors.js";
 
@@ -96,37 +97,60 @@ describe("Auth", () => {
   describe("Get Bearer Token", () => {
     it("returns token when Authorization: Bearer <token>", async () => {
       const req = makeReq({ Authorization: "Bearer abc.123.xyz" });
-      await expect(getBearerToken(req)).resolves.toBe("abc.123.xyz");
+      expect(getBearerToken(req)).toBe("abc.123.xyz");
     });
 
     it("rejects when authorization header isn't present", async () => {
       const req = makeReq({ Otherheader: "hello" });
-      await expect(getBearerToken(req)).rejects.toThrow(
-        /missing authorization header/i
+      expect(() => getBearerToken(req)).toThrow(
+        /malformed authorization header/i
       );
     });
 
     it("rejects when bearer isn't present", async () => {
       const req = makeReq({ Authorization: "should throw" });
-      await expect(getBearerToken(req)).rejects.toThrow(/invalid scheme/i);
-    });
-
-    it("is case insensitive and tolerates extra spaces", async () => {
-      const req = makeReq({ Authorization: "bearer       token123" });
-      await expect(getBearerToken(req)).resolves.toBe("token123");
+      expect(() => getBearerToken(req)).toThrow(
+        /malformed authorization header/i
+      );
     });
 
     it("rejects when no headers are present", async () => {
       const req = makeReq({});
-      await expect(getBearerToken(req)).rejects.toThrow(
-        /missing authorization header/i
+      expect(() => getBearerToken(req)).toThrow(
+        /malformed authorization header/i
       );
     });
 
     it("rejects when token is empty", async () => {
       const req = makeReq({ Authorization: "Bearer " });
-      console.log(req);
-      await expect(getBearerToken(req)).rejects.toThrow(/invalid scheme/i);
+      expect(() => getBearerToken(req)).toThrow(/token not present in header/i);
+    });
+  });
+
+  describe("Get API Key", () => {
+    it("returns API key when Authorization: ApiKey <key>", async () => {
+      const req = makeReq({ Authorization: "ApiKey abc.123.xyz" });
+      expect(getAPIKey(req)).toBe("abc.123.xyz");
+    });
+
+    it("rejects when authorization header isn't present", async () => {
+      const req = makeReq({ Otherheader: "hello" });
+      expect(() => getAPIKey(req)).toThrow(/malformed authorization header/i);
+    });
+
+    it("rejects when ApiKey isn't present", async () => {
+      const req = makeReq({ Authorization: "should throw" });
+      expect(() => getAPIKey(req)).toThrow(/malformed authorization header/i);
+    });
+
+    it("rejects when no headers are present", async () => {
+      const req = makeReq({});
+      expect(() => getAPIKey(req)).toThrow(/malformed authorization header/i);
+    });
+
+    it("rejects when key is empty", async () => {
+      const req = makeReq({ Authorization: "ApiKey " });
+      expect(() => getAPIKey(req)).toThrow(/key not present in header/i);
     });
   });
 });

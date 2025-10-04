@@ -79,11 +79,36 @@ export function getBearerToken(req: Request | ReqLike) {
   return extractBearerToken(authHeader);
 }
 
-export function extractBearerToken(header: string) {
+function extractBearerToken(header: string) {
   const splitAuth = header.split(" ");
   if (splitAuth.length < 2 || splitAuth[0] !== "Bearer") {
     throw new BadRequestError("malformed authorization header");
   }
+  if (!splitAuth[1]) {
+    throw new BadRequestError("token not present in header");
+  }
+
+  return splitAuth[1];
+}
+
+export function getAPIKey(req: Request | ReqLike) {
+  const authHeader = req.get("Authorization");
+  if (!authHeader) {
+    throw new UnauthorizedError("malformed authorization header");
+  }
+
+  return extractAPIKey(authHeader);
+}
+
+function extractAPIKey(header: string) {
+  const splitAuth = header.split(" ");
+  if (splitAuth.length < 2 || splitAuth[0] !== "ApiKey") {
+    throw new BadRequestError("malformed authorization header");
+  }
+  if (!splitAuth[1]) {
+    throw new BadRequestError("key not present in header");
+  }
+
   return splitAuth[1];
 }
 
