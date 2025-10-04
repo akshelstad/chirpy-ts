@@ -18,3 +18,11 @@ export async function getChirpById(chirpId: string) {
   }
   return rows[0];
 }
+
+export async function deleteChirp(chirpId: string) {
+  const rows = await db
+    .delete(chirps)
+    .where(eq(chirps.id, chirpId))
+    .returning();
+  return rows.length > 0;
+}

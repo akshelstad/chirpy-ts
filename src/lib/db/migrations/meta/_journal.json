@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1758902332022,
-      "tag": "0000_new_doctor_spectrum",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1758907684622,
-      "tag": "0001_organic_natasha_romanoff",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758908356292,
-      "tag": "0002_familiar_george_stacy",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1758929562320,
-      "tag": "0003_organic_nehzno",
+      "when": 1759455775489,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

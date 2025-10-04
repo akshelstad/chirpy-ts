@@ -10,8 +10,10 @@ import {
   handlerAddChirp,
   handlerGetChirps,
   handlerGetChirp,
+  handlerDeleteChirp,
 } from "./api/chirps.js";
-import { handlerAddUser } from "./api/users.js";
+import { handlerAddUser, handlerUpdateUser } from "./api/users.js";
+import { handlerLogin, handlerRefresh, handlerRevoke } from "./api/auth.js";
 import {
   middlewareErrors,
   middlewareLogResponses,
@@ -21,6 +23,8 @@ import { cfg } from "./config.js";
 
 const migrationClient = postgres(cfg.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), cfg.db.migrationConfig);
+
+const PORT = cfg.api.port;
 
 const app = express();
 
@@ -39,6 +43,17 @@ app.post("/admin/reset", (req, res, next) => {
   Promise.resolve(handlerReset(req, res)).catch(next);
 });
 
+app.post("/api/login", (req, res, next) => {
+  Promise.resolve(handlerLogin(req, res).catch(next));
+});
+
+app.post("/api/users", (req, res, next) => {
+  Promise.resolve(handlerAddUser(req, res).catch(next));
+});
+app.put("/api/users", (req, res, next) => {
+  Promise.resolve(handlerUpdateUser(req, res).catch(next));
+});
+
 app.post("/api/chirps", (req, res, next) => {
   Promise.resolve(handlerAddChirp(req, res)).catch(next);
 });
@@ -48,13 +63,19 @@ app.get("/api/chirps", (req, res, next) => {
 app.get("/api/chirps/:chirpId", (req, res, next) => {
   Promise.resolve(handlerGetChirp(req, res).catch(next));
 });
+app.delete("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(handlerDeleteChirp(req, res).catch(next));
+});
 
-app.post("/api/users", (req, res, next) => {
-  Promise.resolve(handlerAddUser(req, res).catch(next));
+app.post("/api/refresh", (req, res, next) => {
+  Promise.resolve(handlerRefresh(req, res).catch(next));
+});
+app.post("/api/revoke", (req, res, next) => {
+  Promise.resolve(handlerRevoke(req, res).catch(next));
 });
 
 app.use(middlewareErrors);
 
-app.listen(cfg.api.port, () => {
-  console.log(`Server is running at http://localhost:${cfg.api.port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running at http://localhost:${PORT}`);
 });
